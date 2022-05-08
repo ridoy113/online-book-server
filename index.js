@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const res = require('express/lib/response');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
@@ -23,6 +25,18 @@ async function run() {
         const myItemCollection = client.db('bookStore').collection('myItem');
 
 
+        // AUTH
+        app.post('/login', async (req, res) => {
+            const user = req.body;
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: '1d'
+            });
+            res.send({ accessToken });
+        })
+
+
+
+        // TrandingProduct Api
         app.get('/trandingProduct', async (req, res) => {
             const query = {};
             const cursor = trandingProductCollection.find(query);
@@ -55,8 +69,9 @@ async function run() {
         // MyItem Collection Api
 
         app.get('/myItem', async (req, res) => {
+            const authHeader = req.headers.authorization;
+            console.log(authHeader);
             const email = req.query;
-
             const query = { email: email };
             const cursor = myItemCollection.find(query);
             const myItems = await cursor.toArray();
