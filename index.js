@@ -18,8 +18,9 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect();
+        // console.log('db connscted');
         const trandingProductCollection = client.db('bookStore').collection('trandingProduct');
-        const myItemCollection = clint.db('bookStore').collection('myItem');
+        const myItemCollection = client.db('bookStore').collection('myItem');
 
 
         app.get('/trandingProduct', async (req, res) => {
@@ -52,6 +53,16 @@ async function run() {
         });
 
         // MyItem Collection Api
+
+        app.get('/myItem', async (req, res) => {
+            const email = req.query;
+
+            const query = { email: email };
+            const cursor = myItemCollection.find(query);
+            const myItems = await cursor.toArray();
+            res.send(myItems);
+        })
+
         app.post('/myItem', async (req, res) => {
             const myItem = req.body;
             const result = await myItemCollection.insertOne(myItem);
