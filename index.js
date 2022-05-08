@@ -19,6 +19,8 @@ async function run() {
     try {
         await client.connect();
         const trandingProductCollection = client.db('bookStore').collection('trandingProduct');
+        const myItemCollection = clint.db('bookStore').collection('myItem');
+
 
         app.get('/trandingProduct', async (req, res) => {
             const query = {};
@@ -48,6 +50,13 @@ async function run() {
             const result = await trandingProductCollection.deleteOne(query);
             res.send(result);
         });
+
+        // MyItem Collection Api
+        app.post('/myItem', async (req, res) => {
+            const myItem = req.body;
+            const result = await myItemCollection.insertOne(myItem);
+            res.send(result);
+        })
 
     }
     finally {
